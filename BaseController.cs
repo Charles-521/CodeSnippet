@@ -4,7 +4,7 @@
         {
             var user = HttpContext.User.Identity;
 
-            if (filterContext.ActionDescriptor.ActionName != "ResetPassword" && user != null && user.IsAuthenticated && ((CustomIdentity)user).Status == EnumDef.AccountStatus.ResetPassword.ToByte())
+            if (filterContext.ActionDescriptor.ActionName != "ResetPassword" && user != null && user.IsAuthenticated && ((CustomIdentity)user).IsPwdChangeRequired)
             {
                 if (Request.IsAjaxRequest())
                 {
