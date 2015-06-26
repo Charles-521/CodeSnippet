@@ -1,0 +1,50 @@
+#!/usr/bin/python
+
+import sys
+import urllib2
+import json
+import smsparser
+import subprocess
+import shlex
+
+mobile = 'yourmobilenumber'
+type = 'A'
+id = 'userid'
+pwd = 'password'
+message = smsparser.parseMsg(sys.argv[1])
+monitorServer = '10.10.10.10'
+
+#print message
+
+s = 'https://www.bizlive.singtel.com/aggt/SendMsg.jsp?ID={0}&Password={1}&Mobile={2}&Type={3}&Message={4}'.format(id, pwd, mobile, type, message)
+
+#s = sys.argv[1]
+#print s
+
+rcode = urllib2.urlopen(s).read()
+
+print rcode
+
+cmd = 'zabbix_sender -z 127.0.0.1 -p 10051 -s monitorServer -k "sms-trap-log" -o {0}'.format(rcode)
+
+args = shlex.split(cmd)
+print args
+
+#p = subprocess.Popen(cmd, shell=True stdout=subprocess.PIPE)
+p = subprocess.Popen(args)
+p.communicate()
+if p.returncode != 0:
+    print 'sender sms result[{0}] to zabbix failed[error:{1}]'.format(rcode, returncode)
+#while True:
+#    if p.stderr is None:
+#        out = p.stdout.read(1)
+#    else:
+#        out = p.stderr.read(1)
+#    if out == '' and p.poll() != None:
+#        break
+#    if out != '':
+#        sys.stdout.write(out)
+#        sys.stdout.flush()
+
+
+
